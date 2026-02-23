@@ -46,12 +46,12 @@ public class DamageDealer : MonoBehaviour
     IEnumerator DealDamageOverTime(Health health)
     {
         // On applique les dégâts immédiatement à l'entrée
-        health.TakeDamage(damageAmount);
+        health.TakeDamage(-damageAmount);
         yield return new WaitForSeconds(damageInterval);
 
         while (true)
         {
-            health.TakeDamage(damageAmount);
+            health.TakeDamage(-damageAmount);
             yield return new WaitForSeconds(damageInterval);
         }
     }

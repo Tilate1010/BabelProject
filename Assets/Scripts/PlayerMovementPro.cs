@@ -11,14 +11,15 @@ public class PlayerMovementPro : MonoBehaviour
     public float deceleration = 40f;
     private Vector2 moveInput;
     private Vector2 currentVelocity;
-
+    
     [Header("Dash Settings")]
     public float dashSpeed = 20f;
     public float dashDuration = 0.2f;
     public float dashCooldown = 1f;
     private bool isDashing;
     private bool canDash = true;
-
+    public string dashLayerName = "Dodge";
+    private int originalLayer;
     [Header("Dash Visuals")]
     public GameObject ghostPrefab; // GLISSE le PREFAB "DashGhost" ICI
     public float ghostSpawnDelay = 0.05f; // Temps entre chaque fantôme
@@ -68,8 +69,7 @@ public class PlayerMovementPro : MonoBehaviour
         canDash = false;
         isDashing = true;
 
-        // 1. Activer l'animation
-        if (animator != null) animator.SetBool("isDashing", true);
+        gameObject.layer = LayerMask.NameToLayer(dashLayerName);
 
         // 2. Lancer l'effet de traînée en parallèle
         StartCoroutine(SpawnGhostsRoutine());
@@ -88,7 +88,7 @@ public class PlayerMovementPro : MonoBehaviour
 
         // Le dash dure X secondes
         yield return new WaitForSeconds(dashDuration);
-
+        gameObject.layer = originalLayer;
         // FIN DU DASH
         isDashing = false;
         if (animator != null) animator.SetBool("isDashing", false);
@@ -99,10 +99,25 @@ public class PlayerMovementPro : MonoBehaviour
     }
 
     // Nouvelle Coroutine pour faire poper les fantômes
+    // Exemple à mettre sur l'épée du joueur
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Boss"))
+        {
+            // On récupère le script de santé du boss
+            BossHealth bh = other.GetComponent<BossHealth>();
+
+            if (bh != null)
+            {
+                bh.TakeDamage(10f); // Inflige 10 points de dégâts
+            }
+        }
+    }
     private IEnumerator SpawnGhostsRoutine()
     {
         while (isDashing)
         {
+
             // On crée un fantôme à la position actuelle du joueur
             GameObject ghost = Instantiate(ghostPrefab, transform.position, transform.rotation);
 

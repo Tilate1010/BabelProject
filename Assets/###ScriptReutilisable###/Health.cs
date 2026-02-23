@@ -45,7 +45,7 @@ public class Health : MonoBehaviour
     {
         if (isInvulnerable) return;
 
-        currentHealth -= damage;
+        currentHealth += damage;
 
         UpdateUI(); // Met à jour le texte
 
